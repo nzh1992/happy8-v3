@@ -62,7 +62,7 @@ class HistoryData:
 
         return params
 
-    def get_data(self, history_count):
+    def get_data(self, history_count=None):
         """
         获取历史数据
 
@@ -70,9 +70,9 @@ class HistoryData:
         :return: dict.
         """
         if not history_count:
-            error_info = f"history_count参数错误，history_count：{history_count}"
-            logger.error(error_info)
-            raise Exception(error_info)
+            # 如果未指定期数，则获取全部期数
+            history_count = self.get_total_count()
+            logger.debug(f"未指定history_count，获取全部数据，共{history_count}期")
 
         query_params = self._make_params(history_count)
         headers = self._make_headers()
@@ -86,3 +86,11 @@ class HistoryData:
         else:
             logger.debug("调用中国福利彩票，获取历史数据API成功")
             return json.loads(resp.content)
+
+    def get_total_count(self):
+        """
+        获取历史数据总期数
+        :return: int. 总期数
+        """
+        data = self.get_data(history_count=1)
+        return data["total"]

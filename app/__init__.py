@@ -22,6 +22,29 @@ def add_extensions(app):
     db.init_app(app)
 
 
+def register_blueprints(app):
+    """
+    注册蓝图
+    :param app: Flask. Flask应用实例
+    :return:
+    """
+    from app.api.history_data import history_data_bp
+
+    app.register_blueprint(history_data_bp)
+
+
+def load_models(app):
+    """
+    加载模型，并生成数据库表
+    :return:
+    """
+    from app.models.lottery_number import LotteryNumberModel
+
+    with (app.app_context()):
+        db.create_all()
+        logger.debug("数据库表加载完成")
+
+
 def create_app(env):
     app = Flask(__name__)
 
@@ -32,5 +55,11 @@ def create_app(env):
 
     # 添加扩展
     add_extensions(app)
+
+    # 注册路由
+    register_blueprints(app)
+
+    # 加载模型，并生成数据库表
+    load_models(app)
 
     return app
